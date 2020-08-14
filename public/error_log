@@ -1,0 +1,4 @@
+[20-Oct-2019 10:50:57 Asia/Tashkent] PHP Notice:  date_default_timezone_set(): Timezone ID 'UTC+5' is invalid in /home/mis/agro2.mis.uz/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php on line 49
+[29-Oct-2019 14:48:37 Asia/Tashkent] PHP Notice:  date_default_timezone_set(): Timezone ID 'UTC+5' is invalid in /home/mis/agro2.mis.uz/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php on line 49
+[29-Oct-2019 14:51:42 Asia/Tashkent] PHP Notice:  date_default_timezone_set(): Timezone ID 'UTC+5' is invalid in /home/mis/agro2.mis.uz/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php on line 49
+[03-Nov-2019 18:22:21 Asia/Tashkent] PHP Notice:  date_default_timezone_set(): Timezone ID '' is invalid in /home/mis/agro2.mis.uz/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php on line 49
