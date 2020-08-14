@@ -3,11 +3,13 @@
 //use Illuminate\Http;
 use Illuminate\Http\Request;
 use App\DxaRequest;
+use App\MibRequest;
 use App\Customer;
 use App\tbl_vehicles;
 use App\tbl_cities;
 use App\tbl_states;
 use App\vehicle_certificates;
+use App\vehicle_prohibitions;
 use App\TechnicalPassport;
 
 /*
@@ -424,6 +426,174 @@ Route::post('/get_info', function(Request $request){
 	
 	//return print_r($request);
 	//return json_encode($request->application_id);
+});
+
+// WEB-SERVICES FOR MIB
+
+// METHOD 1: Getting information about properties of a particular owner
+Route::post('/mib/get_info', function(Request $request){
+	header("Content-Type: application/json");
+	$requestorIp = $_SERVER['REMOTE_ADDR'];
+
+	$inn=$request->inn_debtor;
+	$pinfl=$request->$request->pinfl_debtor;
+	$customer_name=$request->fio_debtor;
+	$customer_passport_sn = trim($request->passport_sn);
+	$customer_passport_num = trim($request->passport_num);
+	$property_number = $request->property_number;
+	$card_number = $request->card_number;
+
+
+	// validating required fields
+	$validationFailedResponse = [
+		'result_code'=>43,
+		'result_message'=>'Kerakli punktlar to\'ldirilmagan'
+	];
+
+	if(!(($customer_passport_sn && $customer_passport_num) || $pinfl || $inn)){
+		return response()->json($validationFailedResponse);
+	}
+
+	$req = new DxaRequest;
+
+	$req->method = 1;
+	$req->$inn_debtor = $inn;
+	$req->pinfl_debtor = $pinfl;
+	$req->fio_debtor = $customer_name;
+	$req->passport_sn = $customer_passport_sn;
+	$req->passport_num = $customer_passport_num;
+	$req->property_number = $property_number;
+	$req->card_number = $card_number;
+
+	$req->created_at = date('Y-m-d H:i:s');
+	$req->status = 0; // accepted
+	$req->requestor_ip = $requestorIp;
+
+	$message = "xabarnoma qabul qilindi";
+
+	// automatic finding
+	$customer = Customer::where('inn', '=', $inn)
+		->orWhere(function($q) use($pinfl, $customer_passport_sn, $customer_passport_num){
+			$q->where('passport_series', '=', $customer_passport_sn)
+				->where('passport_number', '=', $customer_passport_num)
+				->orWhere('id_number', '=', $pinfl);
+		})->join('tbl_cities', 'tbl_cities.id', '=', 'customers.city_id')
+		->join('tbl_states', 'tbl_states.id', '=', 'tbl_cities.state_id')
+		->select(
+			'customers.*',
+			'tbl_cities.name as city',
+			'tbl_states.name as state'
+		)->first();
+
+	if(empty($customer)){
+		$response = [
+			'result_code' => 43,
+			'result_message' => 'Berilgan ma\'lumotlar bilan mulk egasi topilmadi'
+		];
+		$req->status = 2; // error
+	} else {
+		$response = [
+			'result_code' => 0,
+			'result_message' => $message,
+			'debtor_address' => $customer->state + ', ' + $customer->city + ', ' + $customer->address
+		];
+
+		if($customer->type == 'legal'){
+			$response['debtor_inn'] = $customer->inn;
+			$response['debtor_name'] = $customer->name;
+		}else{
+			$response['passport_sn'] = $customer->passport_series;
+			$response['passport_num'] = $customer_passport_number;
+			$response['fio_debtor'] = trim($customer->lastname + ' ' + $customer->name + ' ' + $customer->middlename);
+			$response['pinfl_debtor'] = $customer->id_number;
+		}
+
+		$transports=tbl_vehicles::join('tbl_vehicle_types','tbl_vehicle_types.id','=','tbl_vehicles.vehicletype_id')
+			->join('tbl_vehicle_brands','tbl_vehicle_brands.id','=','tbl_vehicles.vehiclebrand_id')
+			->where('tbl_vehicles.owner_id',$customer->id)
+			->groupBy('tbl_vehicles.id')
+			->select(
+				'tbl_vehicles.*',
+				'tbl_vehicles.type as main_type',
+				'tbl_vehicle_types.vehicle_type as type',
+				'tbl_vehicle_brands.vehicle_brand as model'
+			)->get();
+
+		$response['property_info'] = [];
+		foreach($transports as $transport){
+			// primary info
+			$property = [
+				'property_name' => $transport->type + ' ' + $transport->model,
+				'property_produced_year' => $transport->modelyear,
+				'property_chassis_num' => $transport->chassis_no,
+				'property_engine_num' => $transport->engineno,
+				'property_note' => "",
+				'ban' => []
+			];
+
+
+			// docs
+			if($transport->main_type=='agregat'){
+				$certificate=vehicle_certificates::where('vehicle_id','=',$transport->id)
+					->join('users', 'users.id', '=', 'vehicle_certificates.user_id')
+					->where('owner_id','=',$transport->owner_id)
+					->where('status','=','active')
+					->select(
+						'vehicle_certificates.*',
+						'users.branch_name'
+					)->first();
+				$property['property_pass_sn'] = $certificate ? $certificate->series : '';
+				$property['property_pass_num'] = $certificate?$certificate->number:'';
+				$property['property_pass_date'] = $certificate ? date('Y-d-m', strtotime($certificate->given_date)) : '';
+				$property['property_pass_give'] = ($certificate && $certificate->branch_name) ? $certificate->branch_name : $customer->state + ', ' + $customer->city;
+			} else {
+				$passport=TechnicalPassport::where('vehicle_id','=',$transport->id)
+					->join('users', 'users.id', '=', 'vehicle_certificates.user_id')
+					->where('owner_id','=',$transport->owner_id)
+					->where('status','=','active')
+					->select(
+						'technical_passports.*',
+						'users.branch_name'
+					)->first();
+				$property['property_pass_sn'] = $passport ? $passport->series : '';
+				$property['property_pass_num'] = $passport?$passport->number:'';
+				$property['property_pass_date'] = $passport ? date('Y-d-m', strtotime($passport->given_date)) : '';
+				$property['property_pass_give'] = ($passport && $passport->branch_name) ? $passport->branch_name : ($customer->state + ', ' + $customer->city);
+			}
+
+			// ban
+			$bans = vehicle_prohibitions::where('action', '=', 'lock')
+				->where('status', '=', 'active')
+				->where('vehicle_id', '=', $transport->id)
+				->where('owner_id', '=', $customer->id)
+				->join('vehicle_lockers', 'vehicle_lockers.id', '=', 'vehicle_prohibitions.locker_id')
+				->select(
+					'vehicle_prohibitions.*',
+					'vehicle_lockers.name as locker'
+				)->get();
+
+			foreach($bans as $ban){
+				$property['ban'][] = [
+					'ban_date' => date('Y-d-m', strtotime($ban->date)),
+					'ban_by' => $ban->locker,
+					'ban_info' => "Buyruq raqami: " + $ban->order_number + "; Xat raqami: " + $ban->letter_number
+				];
+			}
+
+			$response['property_info'][] = $property;
+		}
+	}
+	$req->response = json_encode($response, JSON_UNESCAPED_UNICODE);
+
+	$s = $req->save();
+	if(!$s){
+		return response()->json([
+			'result_code' => 2,
+			'result_message' => 'So\'rovnomani qabul qilishda tizim xatoligi'
+		]);
+	}
+	
+	return response()->json($response);
 });
 
 Route::get('/password/bcrypt', function (Request $request){
