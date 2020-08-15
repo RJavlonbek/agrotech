@@ -613,8 +613,8 @@ Route::post('/mib/lock', function(Request $request){
 	$doc_outgoing_date = $request->doc_outgoing_date;
 	$branch_name = $request->branch_name;
 	$inspector_fio = $request->inspector_fio;
-	$property_pass_info = trim($request->property_pass_info);
-	$property_pass_num = trim($request->property_pass_num);
+	$property_pass_info = $request->property_pass_info ? trim($request->property_pass_info) : "";
+	$property_pass_num = $request->property_pass_num ? trim($request->property_pass_num) : "";
 	$property_number = $request->property_number;
 	$card_number = $request->card_number;
 
