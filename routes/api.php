@@ -454,7 +454,7 @@ Route::post('/mib/get_info', function(Request $request){
 		return response()->json($validationFailedResponse);
 	}
 
-	$req = new DxaRequest;
+	$req = new MibRequest;
 
 	$req->method = 1;
 	$req->inn_debtor = $inn;
