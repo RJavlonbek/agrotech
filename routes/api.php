@@ -657,16 +657,19 @@ Route::post('/mib/lock', function(Request $request){
 	// finding product
 	$product = tbl_vehicles::where('status', '=', 'regged');
 
-	$doc = TechnicalPassport::where('status', '=', 'active')
-		->where('series', '=', $property_pass_info)
-		->where('number', '=', $property_pass_num)
-		->first();
-	if(empty($doc)){
-		$doc = vehicle_certificates::where('status', '=', 'active')
+	if($property_pass_info && $property_pass_num){
+		$doc = TechnicalPassport::where('status', '=', 'active')
 			->where('series', '=', $property_pass_info)
 			->where('number', '=', $property_pass_num)
 			->first();
+		if(empty($doc)){
+			$doc = vehicle_certificates::where('status', '=', 'active')
+				->where('series', '=', $property_pass_info)
+				->where('number', '=', $property_pass_num)
+				->first();
+		}
 	}
+	
 	if(empty($doc) && $property_number){
 		$doc = TransportNumber::where('status', '=', 'active')
 			->where(DB::raw("CONCAT(UPPER(transport_numbers.code), UPPER(transport_numbers.series),  UPPER(transport_numbers.number))"), '=', $property_number)
