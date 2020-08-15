@@ -457,7 +457,7 @@ Route::post('/mib/get_info', function(Request $request){
 	$req = new DxaRequest;
 
 	$req->method = 1;
-	$req->$inn_debtor = $inn;
+	$req->inn_debtor = $inn;
 	$req->pinfl_debtor = $pinfl;
 	$req->fio_debtor = $customer_name;
 	$req->passport_sn = $customer_passport_sn;
