@@ -608,13 +608,12 @@ Route::post('/mib/get_info', function(Request $request){
 Route::post('/mib/lock', function(Request $request){
 	header("Content-Type: application/json");
 	$requestorIp = $_SERVER['REMOTE_ADDR'];
-	//$property_pass_info = "";
 
 	$doc_number = $request->doc_number;
 	$doc_outgoing_date = $request->doc_outgoing_date;
 	$branch_name = $request->branch_name;
 	$inspector_fio = $request->inspector_fio;
-	$property_pass_infoo = trim($request->$property_pass_info);
+	$property_pass_info = trim($request->property_pass_info);
 	$property_pass_num = trim($request->property_pass_num);
 	$property_number = $request->property_number;
 	$card_number = $request->card_number;
@@ -633,7 +632,7 @@ Route::post('/mib/lock', function(Request $request){
 		}
 	}
 
-	if(!(($property_pass_infoo && $property_pass_num) || $property_number)){
+	if(!(($property_pass_info && $property_pass_num) || $property_number)){
 		return response()->json($validationFailedResponse);
 	}
 
@@ -644,7 +643,7 @@ Route::post('/mib/lock', function(Request $request){
 	$req->doc_outgoing_date = $doc_outgoing_date;
 	$req->branch_name = $branch_name;
 	$req->$inspector_fio = $inspector_fio;
-	$req->$property_pass_info = $property_pass_infoo;
+	$req->$property_pass_info = $property_pass_info;
 	$req->property_pass_num = $property_pass_num;
 	$req->property_number = $property_number;
 	$req->card_number = $card_number;
@@ -659,12 +658,12 @@ Route::post('/mib/lock', function(Request $request){
 	$product = tbl_vehicles::where('status', '=', 'regged');
 
 	$doc = TechnicalPassport::where('status', '=', 'active')
-		->where('series', '=', $property_pass_infoo)
+		->where('series', '=', $property_pass_info)
 		->where('number', '=', $property_pass_num)
 		->first();
 	if(empty($doc)){
 		$doc = vehicle_certificates::where('status', '=', 'active')
-			->where('series', '=', $property_pass_infoo)
+			->where('series', '=', $property_pass_info)
 			->where('number', '=', $property_pass_num)
 			->first();
 	}
