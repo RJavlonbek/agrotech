@@ -502,9 +502,9 @@ Route::post('/mib/get_info', function(Request $request){
 		if($customer->type == 'legal'){
 			$response['debtor_inn'] = $customer->inn;
 			$response['debtor_name'] = $customer->name;
-		}else{
+		}else if($customer->type == 'physical'){
 			$response['passport_sn'] = $customer->passport_series;
-			$response['passport_num'] = $customer_passport_number;
+			$response['passport_num'] = $customer->passport_number;
 			$response['fio_debtor'] = trim($customer->lastname . ' ' . $customer->name . ' ' . $customer->middlename);
 			$response['pinfl_debtor'] = $customer->id_number;
 		}
