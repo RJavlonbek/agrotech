@@ -699,11 +699,23 @@ Route::post('/mib/lock', function(Request $request){
 
 		$saveBan = $ban->save();
 
-		$response = [
-			'ban_id' => $ban->id,
-			'result_code' => 0,
-			'result_message' => $message
-		];
+		$updateVehicle = tbl_vehicles::where('id', '=', $doc->vehicle_id)->update([
+			'lock_status'=>'lock',
+			'updated_at'=>date('Y-m-d H:i:s')
+		]);
+
+		if($saveBan && $updateVehicle){
+			$response = [
+				'ban_id' => $ban->id,
+				'result_code' => 0,
+				'result_message' => $message
+			];
+		}else{
+			$response = [
+				'result_code' => 2,
+				'result_message' => "Taqiqqa olishda tizim xatoligi"
+			];
+		}
 	}
 
 	$req->status = 1; // finished
