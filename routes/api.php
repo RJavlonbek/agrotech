@@ -436,7 +436,7 @@ Route::post('/mib/get_info', function(Request $request){
 	$requestorIp = $_SERVER['REMOTE_ADDR'];
 
 	$inn=$request->inn_debtor;
-	$pinfl=$request->$request->pinfl_debtor;
+	$pinfl=$request->pinfl_debtor;
 	$customer_name=$request->fio_debtor;
 	$customer_passport_sn = trim($request->passport_sn);
 	$customer_passport_num = trim($request->passport_num);
