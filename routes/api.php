@@ -477,7 +477,10 @@ Route::post('/mib/get_info', function(Request $request){
 			$q->where('type', '=', 'physical')
 				->where('passport_series', '=', $customer_passport_sn)
 				->where('passport_number', '=', $customer_passport_num)
-				->orWhere('id_number', '=', ($pinfl ? $pinfl : "--"));
+				->orWhere(function($pinflQ) use($pinfl){
+					$pinflQ->whereNotNull('id_number')
+						->where('id_number', '=', $pinfl);
+				});
 		})->join('tbl_cities', 'tbl_cities.id', '=', 'customers.city_id')
 		->join('tbl_states', 'tbl_states.id', '=', 'tbl_cities.state_id')
 		->select(
