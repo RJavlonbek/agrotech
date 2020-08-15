@@ -548,7 +548,7 @@ Route::post('/mib/get_info', function(Request $request){
 				$property['property_pass_give'] = ($certificate && $certificate->branch_name) ? $certificate->branch_name : $customer->state . ', ' . $customer->city;
 			} else {
 				$passport=TechnicalPassport::where('vehicle_id','=',$transport->id)
-					->join('users', 'users.id', '=', 'vehicle_certificates.user_id')
+					->join('users', 'users.id', '=', 'technical_passports.user_id')
 					->where('owner_id','=',$transport->owner_id)
 					->where('status','=','active')
 					->select(
