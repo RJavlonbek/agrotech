@@ -608,7 +608,7 @@ Route::post('/mib/get_info', function(Request $request){
 Route::post('/mib/lock', function(Request $request){
 	header("Content-Type: application/json");
 	$requestorIp = $_SERVER['REMOTE_ADDR'];
-
+	$property_pass_info = "";
 
 	$doc_number = $request->doc_number;
 	$doc_outgoing_date = $request->doc_outgoing_date;
