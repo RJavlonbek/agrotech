@@ -11,6 +11,7 @@ use App\tbl_states;
 use App\vehicle_certificates;
 use App\vehicle_prohibitions;
 use App\TechnicalPassport;
+use App\TransportNumber;
 
 /*
 |--------------------------------------------------------------------------
@@ -590,6 +591,120 @@ Route::post('/mib/get_info', function(Request $request){
 			$response['property_info'][] = $property;
 		}
 	}
+	$req->response = json_encode($response, JSON_UNESCAPED_UNICODE);
+
+	$s = $req->save();
+	if(!$s){
+		return response()->json([
+			'result_code' => 2,
+			'result_message' => 'So\'rovnomani qabul qilishda tizim xatoligi'
+		]);
+	}
+	
+	return response()->json($response);
+});
+
+// METHOD 2: Request to Lock property of a particular owner
+Route::post('/mib/lock', function(Request $request){
+	header("Content-Type: application/json");
+	$requestorIp = $_SERVER['REMOTE_ADDR'];
+
+	$doc_number = $request->doc_number;
+	$doc_outgoing_date = $request->doc_outgoing_date;
+	$branch_name=$request->branch_name;
+	$inspector_fio = $request->$inspector_fio;
+	$property_pass_info = trim($request->$property_pass_info);
+	$property_pass_num = trim($request->property_pass_num);
+	$property_number = $request->property_number;
+	$card_number = $request->card_number;
+
+
+	// validating required fields
+	$validationFailedResponse = [
+		'result_code'=>43,
+		'result_message'=>'Kerakli punktlar to\'ldirilmagan'
+	];
+
+	// PREPARE doc date
+	if($doc_outgoing_date){
+		$ar = explode('-', $doc_outgoing_date);
+		if(count($ar)==3){
+			$doc_outgoing_date = $ar[0].'-'.$ar[2].'-'.$ar[1];
+		}
+	}
+
+	if(!(($property_pass_info && $property_pass_num) || $property_number)){
+		return response()->json($validationFailedResponse);
+	}
+
+	$req = new MibRequest;
+
+	$req->method = 2;
+	$req->doc_number = $doc_number;
+	$req->doc_outgoing_date = $doc_outgoing_date;
+	$req->branch_name = $branch_name;
+	$req->$inspector_fio = $$inspector_fio;
+	$req->$property_pass_info = $$property_pass_info;
+	$req->property_pass_num = $property_pass_num;
+	$req->property_number = $property_number;
+	$req->card_number = $card_number;
+
+	$req->created_at = date('Y-m-d H:i:s');
+	$req->status = 0; // accepted
+	$req->requestor_ip = $requestorIp;
+
+	$message = "Mulk taqiqqa olindi";
+
+	// finding product
+	$product = tbl_vehicles::where('status', '=', 'regged');
+
+	$doc = TechnicalPassport::where('status', '=', 'active')
+		->where('series', '=', $property_pass_info)
+		->where('number', '=', $property_pass_num)
+		->first();
+	if(empty($doc)){
+		$doc = vehicle_certificates::where('status', '=', 'active')
+			->where('series', '=', $property_pass_info)
+			->where('number', '=', $property_pass_num)
+			->first();
+	}
+	if(empty($doc) && $property_number){
+		$doc = TransportNumber::where('status', '=', 'active')
+			->where(DB::raw("CONCAT(UPPER(transport_numbers.code), UPPER(transport_numbers.series),  UPPER(transport_numbers.number))"), '=', $property_number)
+			->first();
+	}
+
+	if(empty($doc)){
+		$response = [
+			'result_code' => 43,
+			'result_message' => 'Berilgan ma\'lumotlar bilan mulk egasi topilmadi'
+		];
+		$req->status = 2; // error
+	} else {
+		// creating ban
+		$ban = new vehicle_prohibitions;
+		$ban->owner_id = $doc->owner_id;
+		$ban->vehicle_id = $doc->vehicle_id;
+		$ban->locker_id = 9; // MIB
+		$ban->date = date('Y-m-d');
+		$ban->action = 'lock';
+		$ban->status = 'active';
+		$ban->order_number = $doc_number;
+		$ban->order_date = $doc_outgoing_date;
+		$ban->letter_number = $doc_number;
+		$ban->letter_date = $doc_outgoing_date;
+		$ban->created_at = date('Y-m-d H:i:s');
+
+		$saveBan = $ban->save();
+
+		$response = [
+			'ban_id' => $ban->id,
+			'result_code' => 0,
+			'result_message' => $message
+		];
+	}
+
+	$req->status = 1; // finished
 	$req->response = json_encode($response, JSON_UNESCAPED_UNICODE);
 
 	$s = $req->save();
