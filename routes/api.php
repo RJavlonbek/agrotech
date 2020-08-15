@@ -472,16 +472,19 @@ Route::post('/mib/get_info', function(Request $request){
 	$message = "xabarnoma qabul qilindi";
 
 	// automatic finding
-	$customer = Customer::where('inn', '=', ($inn ? $inn : "--"))
-		->orWhere(function($q) use($pinfl, $customer_passport_sn, $customer_passport_num){
-			$q->where('type', '=', 'physical')
-				->where('passport_series', '=', $customer_passport_sn)
-				->where('passport_number', '=', $customer_passport_num)
-				->orWhere(function($pinflQ) use($pinfl){
-					$pinflQ->whereNotNull('id_number')
-						->where('id_number', '=', $pinfl);
-				});
-		})->join('tbl_cities', 'tbl_cities.id', '=', 'customers.city_id')
+	$customer = Customer::where('status', '=', 1);
+	
+	if($inn){
+		$customer = $customer->where('inn', '=', $inn);
+	}
+	if($customer_passport_sn && $customer_passport_num){
+		$customer = $customer->where('passport_series', '=', $customer_passport_sn)->where('passport_number', '=', $customer_passport_num);
+	}
+	if($pinfl){
+		$customer = $customer->where('id_number', '=', $pinfl);
+	}
+	
+	$customer = $customer->join('tbl_cities', 'tbl_cities.id', '=', 'customers.city_id')
 		->join('tbl_states', 'tbl_states.id', '=', 'tbl_cities.state_id')
 		->select(
 			'customers.*',
