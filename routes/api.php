@@ -472,7 +472,7 @@ Route::post('/mib/get_info', function(Request $request){
 	$message = "xabarnoma qabul qilindi";
 
 	// automatic finding
-	$customer = Customer::where('inn', '=', $inn)
+	$customer = Customer::where('inn', '=', ($inn ? $inn : "--"))
 		->orWhere(function($q) use($pinfl, $customer_passport_sn, $customer_passport_num){
 			$q->where('type', '=', 'physical')
 				->where('passport_series', '=', $customer_passport_sn)
