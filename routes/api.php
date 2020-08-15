@@ -495,7 +495,7 @@ Route::post('/mib/get_info', function(Request $request){
 		$response = [
 			'result_code' => 0,
 			'result_message' => $message,
-			'debtor_address' => $customer->state + ', ' + $customer->city + ', ' + $customer->address
+			'debtor_address' => $customer->state . ', ' . $customer->city . ', ' . $customer->address
 		];
 
 		if($customer->type == 'legal'){
@@ -504,7 +504,7 @@ Route::post('/mib/get_info', function(Request $request){
 		}else{
 			$response['passport_sn'] = $customer->passport_series;
 			$response['passport_num'] = $customer_passport_number;
-			$response['fio_debtor'] = trim($customer->lastname + ' ' + $customer->name + ' ' + $customer->middlename);
+			$response['fio_debtor'] = trim($customer->lastname . ' ' . $customer->name . ' ' . $customer->middlename);
 			$response['pinfl_debtor'] = $customer->id_number;
 		}
 
@@ -523,7 +523,7 @@ Route::post('/mib/get_info', function(Request $request){
 		foreach($transports as $transport){
 			// primary info
 			$property = [
-				'property_name' => $transport->type + ' ' + $transport->model,
+				'property_name' => $transport->type . ' ' . $transport->model,
 				'property_produced_year' => $transport->modelyear,
 				'property_chassis_num' => $transport->chassis_no,
 				'property_engine_num' => $transport->engineno,
@@ -545,7 +545,7 @@ Route::post('/mib/get_info', function(Request $request){
 				$property['property_pass_sn'] = $certificate ? $certificate->series : '';
 				$property['property_pass_num'] = $certificate?$certificate->number:'';
 				$property['property_pass_date'] = $certificate ? date('Y-d-m', strtotime($certificate->given_date)) : '';
-				$property['property_pass_give'] = ($certificate && $certificate->branch_name) ? $certificate->branch_name : $customer->state + ', ' + $customer->city;
+				$property['property_pass_give'] = ($certificate && $certificate->branch_name) ? $certificate->branch_name : $customer->state . ', ' . $customer->city;
 			} else {
 				$passport=TechnicalPassport::where('vehicle_id','=',$transport->id)
 					->join('users', 'users.id', '=', 'vehicle_certificates.user_id')
@@ -558,7 +558,7 @@ Route::post('/mib/get_info', function(Request $request){
 				$property['property_pass_sn'] = $passport ? $passport->series : '';
 				$property['property_pass_num'] = $passport?$passport->number:'';
 				$property['property_pass_date'] = $passport ? date('Y-d-m', strtotime($passport->given_date)) : '';
-				$property['property_pass_give'] = ($passport && $passport->branch_name) ? $passport->branch_name : ($customer->state + ', ' + $customer->city);
+				$property['property_pass_give'] = ($passport && $passport->branch_name) ? $passport->branch_name : ($customer->state . ', ' . $customer->city);
 			}
 
 			// ban
@@ -576,7 +576,7 @@ Route::post('/mib/get_info', function(Request $request){
 				$property['ban'][] = [
 					'ban_date' => date('Y-d-m', strtotime($ban->date)),
 					'ban_by' => $ban->locker,
-					'ban_info' => "Buyruq raqami: " + $ban->order_number + "; Xat raqami: " + $ban->letter_number
+					'ban_info' => "Buyruq raqami: " . $ban->order_number . "; Xat raqami: " . $ban->letter_number
 				];
 			}
 
