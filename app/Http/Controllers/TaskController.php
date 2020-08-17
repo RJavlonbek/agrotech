@@ -21,8 +21,9 @@ class TaskController extends Controller
     
 	// DXA requests list
     public function list(){
+        $page = (int)Input::get('page');
 		$requests = DxaRequest::select('dxa_requests.*')->orderBy('recieved_at', 'DESC')->paginate(10);
-     	return view('task.list', compact('requests'));
+     	return view('task.list', compact('requests', 'page'));
     }
 
     public function viewTask($id){
@@ -153,12 +154,14 @@ class TaskController extends Controller
     // MIB requests list
     public function mibRequests(){
         $method = (int)Input::get('method');
+        $page = (int)Input::get('page');
+
         $requests = MibRequest::select('mib_requests.*');
         if($method){
             $requests = $requests->where('method', '=', $method);
         }
         
         $requests = $requests->orderBy('created_at', 'DESC')->paginate(10);
-     	return view('task.mib.list', compact('requests', 'method'));
+     	return view('task.mib.list', compact('requests', 'method', 'page'));
     }
 }

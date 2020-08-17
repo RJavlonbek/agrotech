@@ -102,9 +102,19 @@ D 28:26 !-->
 				 <!-- Sidebar Holder -->
 				 <nav id="sidebar" class="nav-sidebar">
 					 <ul class="list-unstyled components" id="accordion">
-						<li class="">
-							<a href="#Apps" class="accordion-toggle wave-effect" data-toggle="collapse" aria-expanded="false">
-								<i class="fa fa-th-large mr-2"></i> So'rovlar
+						<li>
+					 		<a href="{!! url('/mib-requests/list?method=1') !!}" class="slide-item">
+								Qarzdorning mulklari haqida ma'lumotlar uchun so'rovnomalar
+							</a>
+						</li>
+						<li>
+							<a href="{!! url('/mib-requests/list?method=2') !!}" class="slide-item">
+								Qarzdorga tegishli mulkni taqiqqa olish uchun so'rovnomalar
+							</a>
+						</li>
+						<li>
+							<a href="{!! url('/mib-requests/list?method=3') !!}" class="slide-item">
+								Qarzdorga tegishli mulkni taqiqdan chiqarish uchun so'rovnomalar
 							</a>
 						</li>
 						<li class="">
@@ -182,7 +192,7 @@ D 28:26 !-->
 												@endif
 											</thead>
 											<tbody>
-												<?php $i=0; ?>
+												<?php $i=10*$page; ?>
 												@foreach($requests as $req)
 													<?php $i++; ?>
 													@if($method == 1)
