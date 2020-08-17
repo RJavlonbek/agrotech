@@ -416,14 +416,22 @@ Route::group(['prefix'=>'setting','middleware'=>'auth'],function(){
 
 });
 
+// DXA requests
 Route::group(['prefix'=>'task','middleware'=>'auth'],function(){
 	Route::get('/list', 'TaskController@list');
 	Route::get('/list/{id}', 'TaskController@viewTask');
 	Route::post('/save', 'TaskController@saveTask');
 	Route::get('/{id}/response-sent', 'TaskController@responseSent');
 });
-//Country City State ajax
 
+// MIB requests
+Route::group(['prefix' => 'mib-requests', 'middleware' => 'auth'], function(){
+	Route::get('/list', 'TaskController@mibRequests');
+	$route::get('/list/{id}', 'TaskController@viewMibRequest');
+});
+
+
+//Country City State ajax
 Route::get('/getstatefromcountry','CountryAjaxcontroller@getstate');
 Route::get('/getcityfromstate','CountryAjaxcontroller@getcity');
 Route::get('/getcities','CountryAjaxcontroller@getcitiesjson');

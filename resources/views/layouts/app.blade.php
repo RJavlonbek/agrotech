@@ -306,6 +306,13 @@
 									</a>
 								@endif
 
+								@if (CheckAdmin($userid)=='yes')
+									<li number="8">
+										<i class="side-menu__icon fa fa-download"></i>
+										<span class="side-menu__label">MIB so'rovnomalari</span>
+									</li>
+								@endif
+
 					            <a style="color: white;"  href="#" onclick="event.preventDefault();document.getElementById('logout-form2').submit();">
 					            	<div class="mainMenu" style="">
 					            		<i class="side-menu__icon fe fe-log-out"></i>
@@ -880,6 +887,69 @@
                       										<a href="{!! url('/payment/add') !!}" class="slide-item">{{ trans('app.To\'lovlar')}}</a>
                       										<a href="{!! url('/setting/accessrights/add') !!}" class="slide-item">Lavozim boshqaruvi</a>
                       										<a href="{!! url('/docs/add') !!}" class="slide-item">Asos hujjatlar</a>
+														</div>
+
+													</div>
+
+												</div>
+
+											</div>
+
+										</div>
+
+									</div>
+
+								</div>
+
+								<div>
+
+									<div class="row">
+
+										<div class="col-md-12">
+
+											<div class="panel sidetab-menu">
+
+												<div class="tab-menu-heading p-0 pb-2 border-0">
+
+													<div class="tabs-menu ">
+
+														<!-- Tabs -->
+
+														<ul class="nav panel-tabs">
+
+															<li class="">
+																<a  href="#side773" class="active" data-toggle="tab">
+																	<i class="fe fe-list"></i>{{ trans('app.Ro\'yxat')}}
+																</a>
+															</li>
+
+														</ul>
+
+													</div>
+
+												</div>
+
+												<div class="panel-body tabs-menu-body p-0 border-0">
+
+													<div class="tab-content">
+
+														<div class="tab-pane active " id="side773">
+
+															<?php   $userid=Auth::User()->id;?>
+
+															@if(CheckAdmin($userid) =='yes')
+
+																<a href="{!! url('/mib-requests/list?method=1') !!}" class="slide-item">
+																	Qarzdorning mulklari haqida ma'lumotlar uchun so'rovnomalar
+																</a>
+																<a href="{!! url('/mib-requests/list?method=2') !!}" class="slide-item">
+																	Qarzdorga tegishli mulkni taqiqqa olish uchun so'rovnomalar
+																</a>
+																<a href="{!! url('/mib-requests/list?method=3') !!}" class="slide-item">
+																	Qarzdorga tegishli mulkni taqiqdan chiqarish uchun so'rovnomalar
+																</a>
+					  										@endif
+
 														</div>
 
 													</div>
