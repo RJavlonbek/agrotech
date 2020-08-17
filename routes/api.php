@@ -732,6 +732,128 @@ Route::post('/mib/lock', function(Request $request){
 	return response()->json($response);
 });
 
+// METHOD 3: Request to unLock property of a particular owner
+Route::post('/mib/unlock', function(Request $request){
+	header("Content-Type: application/json");
+	$requestorIp = $_SERVER['REMOTE_ADDR'];
+
+	$ban_id = $request->ban_id;
+	$doc_number = $request->doc_number;
+	$doc_outgoing_date = $request->doc_outgoing_date;
+	$branch_name = $request->branch_name;
+	$inspector_fio = $request->inspector_fio;
+
+	// validating required fields
+	$validationFailedResponse = [
+		'result_code'=>43,
+		'result_message'=>'Kerakli punktlar to\'ldirilmagan'
+	];
+
+	// PREPARE doc date
+	if($doc_outgoing_date){
+		$ar = explode('-', $doc_outgoing_date);
+		if(count($ar)==3){
+			$doc_outgoing_date = $ar[0].'-'.$ar[2].'-'.$ar[1];
+		}
+	}
+
+	if(!($ban_id && $branch_name)){
+		return response()->json($validationFailedResponse);
+	}
+
+	$req = new MibRequest;
+
+	$req->method = 3;
+	$req->ban_id = $ban_id;
+	$req->doc_number = $doc_number;
+	$req->doc_outgoing_date = $doc_outgoing_date;
+	$req->branch_name = $branch_name;
+	$req->inspector_fio = $inspector_fio;
+
+	$req->created_at = date('Y-m-d H:i:s');
+	$req->status = 0; // accepted
+	$req->requestor_ip = $requestorIp;
+
+	$message = "Mulk taqiqdan yechildi";
+
+	// finding product
+	$product = tbl_vehicles::where('status', '=', 'regged');
+
+	$ban = vehicle_prohibitions::where('action', '=', 'lock')
+		->where('id', '=', $ban_id)
+		->where('locker_id', '=', 9)
+		->first();
+
+	if(empty($ban)){
+		$response = [
+			'result_code' => 43,
+			'result_message' => 'Berilgan id bilan taqiqqa olish ma\'lumotlari topilmadi'
+		];
+		$req->status = 2; // error
+	} else {
+		// updating old lock entity
+		$ban->status = 'inactive';
+		$ban->save();
+
+		// creating new unlock entity
+		$unBan = new vehicle_prohibitions;
+		$unBan->owner_id = $ban->owner_id;
+		$unBan->vehicle_id = $ban->vehicle_id;
+		$unBan->locker_id = 9; // MIB
+		$unBan->date = date('Y-m-d');
+		$unBan->action = 'unlock';
+		$unBan->status = 'active';
+		$unBan->order_number = $doc_number;
+		$unBan->order_date = $doc_outgoing_date;
+		$unBan->letter_number = $doc_number;
+		$unBan->letter_date = $doc_outgoing_date;
+		$unBan->created_at = date('Y-m-d H:i:s');
+
+		$saveUnBan = $unBan->save();
+
+		// updating vehicle
+		// finding active lock entities
+		$vehicleProhibitions = vehicle_prohibitions::where('status', '=', 'active')
+			->where('action', '=', 'lock')
+			->get();
+
+		// if not any found, we are unlocking vehicle 
+		if(empty($vehicleProhibitions)){
+			$updateVehicle = tbl_vehicles::where('id', '=', $doc->vehicle_id)->update([
+				'lock_status'=>'unlock',
+				'updated_at'=>date('Y-m-d H:i:s')
+			]);
+		}
+		
+
+		if($saveUnBan){
+			$response = [
+				'ban_id' => $ban->id,
+				'result_code' => 0,
+				'result_message' => $message
+			];
+		}else{
+			$response = [
+				'result_code' => 2,
+				'result_message' => "Taqiqdan chiqarishda tizim xatoligi"
+			];
+		}
+	}
+
+	$req->status = 1; // finished
+	$req->response = json_encode($response, JSON_UNESCAPED_UNICODE);
+
+	$s = $req->save();
+	if(!$s){
+		return response()->json([
+			'result_code' => 2,
+			'result_message' => 'So\'rovnomani qabul qilishda tizim xatoligi'
+		]);
+	}
+	
+	return response()->json($response);
+});
+
 Route::get('/password/bcrypt', function (Request $request){
 	return bcrypt($request->password);
 });
