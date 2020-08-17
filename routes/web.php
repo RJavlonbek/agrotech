@@ -427,7 +427,7 @@ Route::group(['prefix'=>'task','middleware'=>'auth'],function(){
 // MIB requests
 Route::group(['prefix' => 'mib-requests', 'middleware' => 'auth'], function(){
 	Route::get('/list', 'TaskController@mibRequests');
-	$route::get('/list/{id}', 'TaskController@viewMibRequest');
+	Route::get('/list/{id}', 'TaskController@viewMibRequest');
 });
 
 
