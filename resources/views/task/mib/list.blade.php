@@ -238,7 +238,6 @@ D 28:26 !-->
 													@elseif($method == 2)
 														<tr>
 															<th scope="row">{{ $i }}</th>
-															<td>{{ $req->fio_debtor }}</td>
 															<td>{{ $req->branch_name }}</td>
 															<td>{{ $req->inspector_fio }}</td>
 															<td>{{ date('d.m.Y', strtotime($req->doc_outgoing_date)) }} №{{ $req->doc_number }}</td>
