@@ -169,7 +169,7 @@ D 28:26 !-->
 													<tr>
 														<th scope="col">№</th>
 														<th scope="col">MIB filiali</th>
-														<th scope="col">Mas'ul xodim</th>
+														<th scope="col">MIB xodimi</th>
 														<th scope="col">Buyruq ma'lumotlari</th>
 														<th scope="col">Texnika ma'lumotlari</th>
 														<th scope="col">Sana </th>
@@ -192,7 +192,7 @@ D 28:26 !-->
 												@endif
 											</thead>
 											<tbody>
-												<?php $i=10*$page; ?>
+												<?php $i=$page == 1 ? 0 : 10*$page; ?>
 												@foreach($requests as $req)
 													<?php $i++; ?>
 													@if($method == 1)
@@ -239,18 +239,18 @@ D 28:26 !-->
 														<tr>
 															<th scope="row">{{ $i }}</th>
 															<td>{{ $req->fio_debtor }}</td>
+															<td>{{ $req->branch_name }}</td>
+															<td>{{ $req->inspector_fio }}</td>
+															<td>{{ date('d.m.Y', strtotime($req->doc_outgoing_date)) }} №{{ $req->doc_number }}</td>
 															<td>
-																@if($req->inn_debtor)
-																	INN: {{ $req->inn_debtor }}
-																@elseif($req->passport_sn && $req->passport_num)
-																	Pasport: {{ $req->passport_sn . $req->passport_num }}
-																@elseif($req->pinfl_debtor)
-																	SHIR: {{ $req->pinfl_debtor }}
-																@else
-																	--
+																@if($req->property_number)
+																	<li>DRB: {{ $req->property_number }}</li>
+																@endif
+																@if($req->property_pass_info && $req->property_pass_num)
+																	<li>Hujjat: {{ $req->property_pass_info.$property_pass_num }}</li>
 																@endif
 															</td>
-															<td>{{ date('d.m.Y H:i', strtotime($req->created_at)) }}</td>
+															<td>{{ date('d.m.Y H:i:s', strtotime($req->created_at))}}
 															<td>
 																@if($req->status==0)
 																	<span class="badge badge-info">
@@ -278,19 +278,11 @@ D 28:26 !-->
 													@elseif($method == 3)
 														<tr>
 															<th scope="row">{{ $i }}</th>
-															<td>{{ $req->fio_debtor }}</td>
-															<td>
-																@if($req->inn_debtor)
-																	INN: {{ $req->inn_debtor }}
-																@elseif($req->passport_sn && $req->passport_num)
-																	Pasport: {{ $req->passport_sn . $req->passport_num }}
-																@elseif($req->pinfl_debtor)
-																	SHIR: {{ $req->pinfl_debtor }}
-																@else
-																	--
-																@endif
-															</td>
-															<td>{{ date('d.m.Y H:i', strtotime($req->created_at)) }}</td>
+															<td>{{ $req->ban_id }}</td>
+															<td>{{ $req->branch_name }}</td>
+															<td>{{ $req->inspector_fio }}</td>
+															<td>{{ date('d.m.Y', strtotime($req->doc_outgoing_date)) }} №{{ $req->doc_number }}</td>
+															<td>{{ date('d.m.Y H:i:s', strtotime($req->created_at))}}
 															<td>
 																@if($req->status==0)
 																	<span class="badge badge-info">

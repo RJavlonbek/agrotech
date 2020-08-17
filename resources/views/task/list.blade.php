@@ -149,7 +149,7 @@ D 28:26 !-->
 											   	</tr>
 											</thead>
 											<tbody>
-												<?php $i=10*$page; ?>
+												<?php $i=$page == 1 ? 0 : 10*$page; ?>
 												@foreach($requests as $req)
 													<?php $i++; ?>
 												   	<tr>

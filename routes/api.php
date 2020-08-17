@@ -757,7 +757,7 @@ Route::post('/mib/unlock', function(Request $request){
 		}
 	}
 
-	if(!($ban_id && $branch_name)){
+	if(!($ban_id && $branch_name && $inspector_fio)){
 		return response()->json($validationFailedResponse);
 	}
 
