@@ -155,13 +155,44 @@ class TaskController extends Controller
     public function mibRequests(){
         $method = (int)Input::get('method');
         $page = (int)Input::get('page');
+        $s = Input::get("search");
+        $status = Input::get("status");
 
         $requests = MibRequest::select('mib_requests.*');
+
+        // filter by method
         if($method){
             $requests = $requests->where('method', '=', $method);
         }
+
+        // filter by status
+        if($status){
+            $requests = $requests->where('status', '=', $status);
+        }
+
+        // search engine
+		if($s){
+			$requests = $requests->where(function($query) use($s){
+				$columnsForSearch = [
+					'mib_requests.response',
+                    'mib_requests.pinfl_debtor',
+                    'mib_requests.fio_debtor',
+                    'mib_requests.inn_debtor',
+                    'mib_requests.property_number',
+                    'mib_requests.doc_number',
+                    'mib_requests.branch_name',
+                    'mib_requests.inspector_fio',
+                    DB::raw("CONCAT(UPPER(mib_requests.passport_sn), UPPER(mib_requests.passport_num))"),
+                    DB::raw("CONCAT(UPPER(mib_requests.property_pass_info), UPPER(mib_requests.property_pass_num))"),
+					'mib_requests.ban_id'
+				];
+				foreach($columnsForSearch as $col){
+					$query = $query->orWhere($col, 'like', '%'.$s.'%');
+				}
+			});
+		}
         
         $requests = $requests->orderBy('created_at', 'DESC')->paginate(10);
-     	return view('task.mib.list', compact('requests', 'method', 'page'));
+     	return view('task.mib.list', compact('requests', 'method', 'page', 'status'));
     }
 }

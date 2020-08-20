@@ -66,15 +66,17 @@ D 28:26 !-->
 
 
 								 <div class="search-inline">
-									 <form>
-										 <input type="text" class="form-control" placeholder="Search here" />
-										 <button type="submit">
-											 <i class="fa fa-search"></i>
-										 </button>
-										 <a href="javascript:void(0)" class="search-close">
-											 <i class="fa fa-times"></i>
-										 </a>
-									 </form>
+									<form method="get">
+									 	<input type="hidden" name="method" value="{{ $method }}" />
+										<input type="hidden" name="status" value="{{ $status }}" />
+										<input type="text" class="form-control" name="search" placeholder="Qidirish" />
+										<button type="submit">
+											<i class="fa fa-search"></i>
+										</button>
+										<a href="javascript:void(0)" class="search-close">
+											<i class="fa fa-times"></i>
+										</a>
+									</form>
 								 </div>
 							 </div>
 						 </div>
@@ -148,9 +150,18 @@ D 28:26 !-->
 											So'rovnomalar
 										@endif
 									</h3>
-									 <div class="card-options">
-
-									 </div>
+									<div class="card-options">
+										<form method="get">
+									 		<input type="hidden" name="method" value="{{ $method }}" />
+											<inpit type="hidden" name="search" value="{{ $search }}" />
+											<select class="form-control select2-vehicle-type status-filter" data-placeholder="Holat" name="status">
+												<option value="">Barchasi</option>
+												<option value="0" {{ $status==0 ? "selected='selected'" : ""}} >Qabul qilingan</option>
+												<option value="1" {{ $status==1 ? "selected='selected'" : ""}} >Yakunlangan</option>
+												<option value="2" {{ $status==2 ? "selected='selected'" : ""}} >Xatolik</option>
+											</select>
+										</form>
+									</div>
 								</div>
 								@if(!empty($requests))
 								 	<div class="table-responsive">
@@ -364,6 +375,15 @@ D 28:26 !-->
 
 	 <!-- Custom Js-->
 	 <script src="{{ URL::asset('resources/views/layouts/assets/js/tasks-script.js') }}"></script>
+
+	 <script type="text/javascript">
+	 	$(function(){
+			$('select.status-filter').on('change', function(e){
+				console.log('changed');
+				$(this).closest('form').submit();
+			});
+		});
+	 </script>
 
  </body>
  </html>

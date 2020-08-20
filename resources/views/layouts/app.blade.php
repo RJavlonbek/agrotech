@@ -307,10 +307,12 @@
 								@endif
 
 								@if (CheckAdmin($userid)=='yes')
-									<li number="8">
-										<i class="side-menu__icon fa fa-download"></i>
-										<span class="side-menu__label">MIB so'rovnomalari</span>
-									</li>
+									<a style="color: white;" href="{!! url('/mib-requests/list?method=1') !!}">
+										<div class="mainMenu" style="">
+											<i class="side-menu__icon fa fa-download"></i>
+											<span class="side-menu__label">MIB so'rovnomalari</span>
+										</div>
+									</a>
 								@endif
 
 					            <a style="color: white;"  href="#" onclick="event.preventDefault();document.getElementById('logout-form2').submit();">
@@ -924,33 +926,6 @@
 															</li>
 
 														</ul>
-
-													</div>
-
-												</div>
-
-												<div class="panel-body tabs-menu-body p-0 border-0">
-
-													<div class="tab-content">
-
-														<div class="tab-pane active " id="side773">
-
-															<?php   $userid=Auth::User()->id;?>
-
-															@if(CheckAdmin($userid) =='yes')
-
-																<a href="{!! url('/mib-requests/list?method=1') !!}" class="slide-item">
-																	Qarzdorning mulklari haqida ma'lumotlar uchun so'rovnomalar
-																</a>
-																<a href="{!! url('/mib-requests/list?method=2') !!}" class="slide-item">
-																	Qarzdorga tegishli mulkni taqiqqa olish uchun so'rovnomalar
-																</a>
-																<a href="{!! url('/mib-requests/list?method=3') !!}" class="slide-item">
-																	Qarzdorga tegishli mulkni taqiqdan chiqarish uchun so'rovnomalar
-																</a>
-					  										@endif
-
-														</div>
 
 													</div>
 
