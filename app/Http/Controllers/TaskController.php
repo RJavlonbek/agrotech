@@ -166,7 +166,7 @@ class TaskController extends Controller
         }
 
         // filter by status
-        if($status){
+        if($status != ""){
             $requests = $requests->where('status', '=', $status);
         }
 
@@ -194,7 +194,7 @@ class TaskController extends Controller
         
         $search = $s;
         
-        $requests = $requests->orderBy('created_at', 'DESC')->paginate(10);
+        $requests = $requests->orderBy('created_at', 'DESC')->paginate(2);
      	return view('task.mib.list', compact('requests', 'method', 'page', 'search', 'status'));
     }
 }

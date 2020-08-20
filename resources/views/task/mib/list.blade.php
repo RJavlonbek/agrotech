@@ -153,12 +153,12 @@ D 28:26 !-->
 									<div class="card-options">
 										<form method="get">
 									 		<input type="hidden" name="method" value="{{ $method }}" />
-											<inpit type="hidden" name="search" value="{{ $search }}" />
+											<input type="hidden" name="search" value="{{ $search }}" />
 											<select class="form-control select2-vehicle-type status-filter" data-placeholder="Holat" name="status">
 												<option value="">Barchasi</option>
-												<option value="0" {{ $status==0 ? "selected='selected'" : ""}} >Qabul qilingan</option>
-												<option value="1" {{ $status==1 ? "selected='selected'" : ""}} >Yakunlangan</option>
-												<option value="2" {{ $status==2 ? "selected='selected'" : ""}} >Xatolik</option>
+												<option value="0" {{ $status=="0" ? "selected='selected'" : ""}} >Qabul qilingan</option>
+												<option value="1" {{ $status=="1" ? "selected='selected'" : ""}} >Yakunlangan</option>
+												<option value="2" {{ $status=="2" ? "selected='selected'" : ""}} >Xatolik</option>
 											</select>
 										</form>
 									</div>
