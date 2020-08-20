@@ -69,7 +69,7 @@ D 28:26 !-->
 									<form method="get">
 									 	<input type="hidden" name="method" value="{{ $method }}" />
 										<input type="hidden" name="status" value="{{ $status }}" />
-										<input type="text" class="form-control" name="search" placeholder="Qidirish" />
+										<input type="text" class="form-control" name="search" placeholder="Qidirish" value="{{ $search }}" />
 										<button type="submit">
 											<i class="fa fa-search"></i>
 										</button>

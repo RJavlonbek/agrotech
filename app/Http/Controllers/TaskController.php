@@ -190,9 +190,11 @@ class TaskController extends Controller
 					$query = $query->orWhere($col, 'like', '%'.$s.'%');
 				}
 			});
-		}
+        }
+        
+        $search = $s;
         
         $requests = $requests->orderBy('created_at', 'DESC')->paginate(10);
-     	return view('task.mib.list', compact('requests', 'method', 'page', 'status'));
+     	return view('task.mib.list', compact('requests', 'method', 'page', 'search', 'status'));
     }
 }
