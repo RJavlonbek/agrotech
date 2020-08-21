@@ -243,7 +243,7 @@ D 28:26 !-->
 {{ print_r($response) }}
                                             </pre>
                                             <pre>
-{{ $req->response) }}
+{{ $req->response }}
                                             </pre>
 										</div>
 									</div>
