@@ -124,7 +124,7 @@ D 28:26 !-->
 				 <div class="content-area" response="{{ $req->response }}" request-id="{{ $req->id }}" request-status="{{ $req->status }}">
 				 	<input type="hidden" name="_token" value="{{csrf_token()}}">
 					<div class="page-header">
-						<h4 class="page-title">Davlat xizmatlari markazi tomonidan yuborilgan so'rov haqida ma'lumot </h4>
+						<h4 class="page-title">MIB tomonidan yuborilgan so'rov haqida ma'lumot </h4>
 						<ol class="breadcrumb">
 							 <li class="breadcrumb-item"><a href="/">Agro </a></li>
 							 <li class="breadcrumb-item active" aria-current="page"><a href="/task/list">So'rovlar</a></li>
@@ -150,7 +150,7 @@ D 28:26 !-->
 										<h5>
 											@if($req->status==0)
 												<span class="badge badge-info">
-													Qabul 
+													Qabul qilingan
 												</span>
 											@elseif($req->status==1)
 												<span class="badge badge-success">
@@ -163,6 +163,10 @@ D 28:26 !-->
 													Xatolik
 												</span>
 											@endif
+                                            <span class="badge badge-info ml-2">
+                                                <i class="fa fa-clock-o"></i>
+                                                {{ date('d.m.Y H:i', strtotime($req->created_at)) }}
+                                            </span>
 										</h5>
 									</div>
 								</div>
@@ -193,7 +197,7 @@ D 28:26 !-->
                                                         @elseif($req->method == 2)
                                                             <tr>
                                                                 <td class="field-name">Ijro etiluvchi hujjat: </td>
-                                                                <td class="field-value">{{ date('d.m.Y H:i', strtotime($req->doc_outgoing_date)) . " №" . $req->doc_number }}</td>
+                                                                <td class="field-value">{{ date('d.m.Y', strtotime($req->doc_outgoing_date)) . " №" . $req->doc_number }}</td>
                                                             </tr>
                                                             <tr>
                                                                 <td class="field-name">MIB filiali : </td>
@@ -218,7 +222,7 @@ D 28:26 !-->
                                                             </tr>
                                                             <tr>
                                                                 <td class="field-name">Ijro etiluvchi hujjat: </td>
-                                                                <td class="field-value">{{ date('d.m.Y H:i', strtotime($req->doc_outgoing_date)) . " №" . $req->doc_number }}</td>
+                                                                <td class="field-value">{{ date('d.m.Y', strtotime($req->doc_outgoing_date)) . " №" . $req->doc_number }}</td>
                                                             </tr>
                                                             <tr>
                                                                 <td class="field-name">MIB filiali : </td>
