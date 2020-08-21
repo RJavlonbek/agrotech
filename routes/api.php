@@ -591,6 +591,7 @@ Route::post('/mib/get_info', function(Request $request){
 			$response['property_info'][] = $property;
 		}
 	}
+	$req->status = 1;
 	$req->response = json_encode($response, JSON_UNESCAPED_UNICODE);
 
 	$s = $req->save();
