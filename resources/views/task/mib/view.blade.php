@@ -240,7 +240,10 @@ D 28:26 !-->
 										<div class="col-6">
 											<h3>Javob (Agroinspeksiya) </h3>
 											<pre>
-                                                {{ print_r($response) }}
+{{ print_r($response) }}
+                                            </pre>
+                                            <pre>
+{{ $req->response) }}
                                             </pre>
 										</div>
 									</div>
