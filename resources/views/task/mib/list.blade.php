@@ -160,6 +160,10 @@ D 28:26 !-->
 												<option value="1" {{ $status=="1" ? "selected='selected'" : ""}} >Yakunlangan</option>
 												<option value="2" {{ $status=="2" ? "selected='selected'" : ""}} >Xatolik</option>
 											</select>
+											<input type="text" name="search" value="{{ $search }}" class="form-control" placeholder="Qidirish..." />
+											<button type="submit" class="btn btn-primary">
+												<i class="fa fa-search"></i>
+											</button>
 										</form>
 									</div>
 								</div>
