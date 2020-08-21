@@ -136,11 +136,11 @@ D 28:26 !-->
 							<div class="card">
 								<div class="card-header ">
 									<h3 class="card-title ">
-                                        @if($req->$method == 1)
+                                        @if($req->method == 1)
                                             Qarzdorning mulklari haqida ma'lumotlar uchun so'rovnoma
-                                        @elseif($req->$method == 2)
+                                        @elseif($req->method == 2)
                                             Qarzdorga tegishli mulkni taqiqqa olish uchun so'rovnoma
-                                        @elseif($req->$method == 3)
+                                        @elseif($req->method == 3)
                                             Qarzdorga tegishli mulkni taqiqdan chiqarish uchun so'rovnoma
                                         @else
                                             So'rovnomalar
