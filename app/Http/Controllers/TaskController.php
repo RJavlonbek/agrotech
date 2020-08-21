@@ -194,7 +194,7 @@ class TaskController extends Controller
         
         $search = $s;
         
-        $requests = $requests->orderBy('created_at', 'DESC')->paginate(2);
+        $requests = $requests->orderBy('created_at', 'DESC')->paginate(10);
         $requests = $requests->appends(Input::except('page'));
 
      	return view('task.mib.list', compact('requests', 'method', 'page', 'search', 'status'));
