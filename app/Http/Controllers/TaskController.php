@@ -196,7 +196,22 @@ class TaskController extends Controller
         
         $requests = $requests->orderBy('created_at', 'DESC')->paginate(2);
         $requests = $requests->appends(Input::except('page'));
-        
+
      	return view('task.mib.list', compact('requests', 'method', 'page', 'search', 'status'));
+    }
+
+    // MIB request details
+    public function viewMibRequest($id){
+        $request = MibRequest::where('id', '=', $id)->first();
+        if(!empty($request)){
+
+            $req=$request;
+
+            $response = json_decode($req->response);
+
+            return view('task.mib.view', compact('req', 'response'));
+        }else{
+            return 'not-found';
+        }
     }
 }
