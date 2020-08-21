@@ -151,7 +151,7 @@ D 28:26 !-->
 										@endif
 									</h3>
 									<div class="card-options">
-										<form method="get">
+										<form method="get" class="d-flex">
 									 		<input type="hidden" name="method" value="{{ $method }}" />
 											<input type="hidden" name="search" value="{{ $search }}" />
 											<select class="form-control select2-vehicle-type status-filter" data-placeholder="Holat" name="status">
@@ -160,8 +160,8 @@ D 28:26 !-->
 												<option value="1" {{ $status=="1" ? "selected='selected'" : ""}} >Yakunlangan</option>
 												<option value="2" {{ $status=="2" ? "selected='selected'" : ""}} >Xatolik</option>
 											</select>
-											<input type="text" name="search" value="{{ $search }}" class="form-control" placeholder="Qidirish..." />
-											<button type="submit" class="btn btn-primary">
+											<input type="text" name="search" value="{{ $search }}" class="form-control ml-2" placeholder="Qidirish..." />
+											<button type="submit" class="btn btn-primary ml-2">
 												<i class="fa fa-search"></i>
 											</button>
 										</form>
