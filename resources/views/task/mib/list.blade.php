@@ -384,7 +384,7 @@ D 28:26 !-->
 	 	$(function(){
 			$('select.status-filter').on('change', function(e){
 				console.log('changed');
-				$(this).closest('form').submit();
+				//$(this).closest('form').submit();
 			});
 		});
 	 </script>
