@@ -240,7 +240,7 @@ D 28:26 !-->
 										<div class="col-6">
 											<h3>Javob (Agroinspeksiya) </h3>
                                             <pre>
-{{ json_encode($rsponse, JSON_PRETTY_PRINT) }}
+{{ json_encode($response, JSON_PRETTY_PRINT) }}
                                             </pre>
 										</div>
 									</div>
