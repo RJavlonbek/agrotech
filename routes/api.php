@@ -531,8 +531,9 @@ Route::post('/mib/get_info', function(Request $request){
 		foreach($transports as $transport){
 			// primary info
 			$property = [
-				'property_name' => $transport->type . ' ' . $transport->model,
-				'property_produced_year' => $transport->modelyear,
+				'property_name' => $transport->type,
+				'property_model' => $transport->model,
+ 				'property_produced_year' => $transport->modelyear,
 				'property_chassis_num' => $transport->chassis_no,
 				'property_engine_num' => $transport->engineno,
 				'property_note' => "",
@@ -540,7 +541,14 @@ Route::post('/mib/get_info', function(Request $request){
 			];
 
 
-			// docs
+			// DOCS
+			// Davlat raqami belgisi
+			$number = TransportNumber::where('vehicle_id', '=', $transport->id)
+				->where('status', '=', 'active')
+				->first();
+			$property['property_number'] = empty($number) ? '-' : ($number->code.' '.$number->series.$number->number);
+			
+			// Texnika hujjati (tex-pasport|guvohnoma)
 			if($transport->main_type=='agregat'){
 				$certificate=vehicle_certificates::where('vehicle_id','=',$transport->id)
 					->join('users', 'users.id', '=', 'vehicle_certificates.user_id')
@@ -582,6 +590,7 @@ Route::post('/mib/get_info', function(Request $request){
 
 			foreach($bans as $ban){
 				$property['ban'][] = [
+					'ban_id' => $ban->id,
 					'ban_date' => date('Y-d-m', strtotime($ban->date)),
 					'ban_by' => $ban->locker,
 					'ban_info' => "Buyruq raqami: " . $ban->order_number . "; Xat raqami: " . $ban->letter_number
