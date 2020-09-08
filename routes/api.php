@@ -547,7 +547,7 @@ Route::post('/mib/get_info', function(Request $request){
 				->where('status', '=', 'active')
 				->first();
 			$property['property_number'] = empty($number) ? '-' : ($number->code.' '.$number->series.$number->number);
-			
+
 			// Texnika hujjati (tex-pasport|guvohnoma)
 			if($transport->main_type=='agregat'){
 				$certificate=vehicle_certificates::where('vehicle_id','=',$transport->id)
@@ -642,7 +642,7 @@ Route::post('/mib/lock', function(Request $request){
 		}
 	}
 
-	if(!(($property_pass_info && $property_pass_num) || $property_number)){
+	if(!($doc_number && $branch_name && ($property_number || ($property_pass_info && $property_pass_num)) && $inspector_fio)){
 		return response()->json($validationFailedResponse);
 	}
 
