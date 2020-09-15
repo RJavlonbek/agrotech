@@ -639,10 +639,14 @@ Route::post('/mib/lock', function(Request $request){
 	$property_number = $request->property_number;
 	$card_number = $request->card_number;
 
-	// validating required fields
+	// validating
 	$validationFailedResponse = [
 		'result_code'=>43,
 		'result_message'=>'Kerakli punktlar to\'ldirilmagan'
+	];
+	$dateValidationFailedResponse = [
+		'result_code' => 43,
+		'result_message' => 'Sana formati noto\'g\'ri kiritilgan'
 	];
 
 	// PREPARE doc date
@@ -650,6 +654,8 @@ Route::post('/mib/lock', function(Request $request){
 		$ar = explode('-', $doc_outgoing_date);
 		if(count($ar)==3){
 			$doc_outgoing_date = $ar[0].'-'.$ar[2].'-'.$ar[1];
+		}else {
+			return response()->json($dateValidationFailedResponse);
 		}
 	}
 
@@ -664,7 +670,7 @@ Route::post('/mib/lock', function(Request $request){
 		->first();
 	if(!empty($request)){
 		$existanceFailedResponse = [
-			'result_code' => 43,
+			'result_code' => 3,
 			'result_message' => 'Bu hujjat bilan taqiq o\'rnatilgan. Taqiq ID: ' . $request->id
 		];
 		return response()->json($existanceFailedResponse);
