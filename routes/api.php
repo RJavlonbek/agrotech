@@ -516,8 +516,9 @@ Route::post('/mib/get_info', function(Request $request){
 			$response['pinfl_debtor'] = $customer->id_number;
 		}
 
-		$transports=tbl_vehicles::join('tbl_vehicle_types','tbl_vehicle_types.id','=','tbl_vehicles.vehicletype_id')
+		$transports=tbl_vehicles::where('status', '=', 'regged')
 			->join('tbl_vehicle_brands','tbl_vehicle_brands.id','=','tbl_vehicles.vehiclebrand_id')
+			->join('tbl_vehicle_types','tbl_vehicle_types.id','=','tbl_vehicle_brands.vehicle_id')
 			->where('tbl_vehicles.owner_id',$customer->id)
 			->groupBy('tbl_vehicles.id')
 			->select(
