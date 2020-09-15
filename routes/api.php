@@ -589,11 +589,21 @@ Route::post('/mib/get_info', function(Request $request){
 				)->get();
 
 			foreach($bans as $ban){
+				$banBy = $ban->locker;
+				if($ban->locker_id == 9){
+					$banRequest = MibRequest::where('method', '=', 2)
+						->where('doc_number', '=', $ban->order_number)
+						->where('status', '=', 1) // success
+						->first();
+					if(!empty($banRequest)){
+						$banBy = $banRequest->branch_name . ", " . $banRequest->inspector_fio;
+					}
+				}
 				$property['ban'][] = [
 					'ban_id' => $ban->id,
 					'ban_date' => date('Y-d-m', strtotime($ban->date)),
-					'ban_by' => $ban->locker,
-					'ban_info' => "Buyruq raqami: " . $ban->order_number . "; Xat raqami: " . $ban->letter_number
+					'ban_by' => $banBy,
+					'ban_info' => "Ijro ish raqami: " . $ban->order_number . "; Ijro ish sanasi: " . date('Y-d-m', strtotime($ban->order_date))
 				];
 			}
 
@@ -646,6 +656,19 @@ Route::post('/mib/lock', function(Request $request){
 		return response()->json($validationFailedResponse);
 	}
 
+	// checking existance of prohibition entity with given doc number
+	$request = vehicle_prohibitions::where('action', '=', 'lock')
+		->where('locker_id', '=', 9)
+		->where('order_number', '=', $doc_number)
+		->first();
+	if(!empty($request)){
+		$existanceFailedResponse = [
+			'result_code' => 43,
+			'result_message' => 'Bu hujjat bilan taqiq o\'rnatilgan. Taqiq ID: ' . $request->id
+		];
+		return response()->json($existanceFailedResponse);
+	}
+
 	$req = new MibRequest;
 
 	$req->method = 2;
@@ -664,7 +687,7 @@ Route::post('/mib/lock', function(Request $request){
 
 	$message = "Mulk taqiqqa olindi";
 
-	// finding product
+	// finding property
 	$product = tbl_vehicles::where('status', '=', 'regged');
 
 	if($property_pass_info && $property_pass_num){
