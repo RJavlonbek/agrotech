@@ -650,13 +650,11 @@ Route::post('/mib/lock', function(Request $request){
 	];
 
 	// PREPARE doc date
-	if($doc_outgoing_date){
-		$ar = explode('-', $doc_outgoing_date);
-		if(count($ar)==3){
-			$doc_outgoing_date = $ar[0].'-'.$ar[2].'-'.$ar[1];
-		}else {
-			return response()->json($dateValidationFailedResponse);
-		}
+	$ar = explode('-', $doc_outgoing_date);
+	if($doc_outgoing_date && count($ar)==3){
+		$doc_outgoing_date = $ar[0].'-'.$ar[2].'-'.$ar[1];
+	}else {
+		return response()->json($dateValidationFailedResponse);
 	}
 
 	if(!($doc_number && $branch_name && ($property_number || ($property_pass_info && $property_pass_num)) && $inspector_fio)){
