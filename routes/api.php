@@ -509,11 +509,15 @@ Route::post('/mib/get_info', function(Request $request){
 		if($customer->type == 'legal'){
 			$response['debtor_inn'] = $customer->inn;
 			$response['debtor_name'] = $customer->name;
+
+			$req->fio_debtor = $customer->name;
 		}else if($customer->type == 'physical'){
 			$response['passport_sn'] = $customer->passport_series;
 			$response['passport_num'] = $customer->passport_number;
 			$response['fio_debtor'] = trim($customer->lastname . ' ' . $customer->name . ' ' . $customer->middlename);
 			$response['pinfl_debtor'] = $customer->id_number;
+
+			$req->fio_debtor = trim($customer->lastname . ' ' . $customer->name . ' ' . $customer->middlename);
 		}
 
 		$transports=tbl_vehicles::where('status', '=', 'regged')
@@ -781,18 +785,22 @@ Route::post('/mib/unlock', function(Request $request){
 	$branch_name = $request->branch_name;
 	$inspector_fio = $request->inspector_fio;
 
-	// validating required fields
+	// validating
 	$validationFailedResponse = [
 		'result_code'=>43,
 		'result_message'=>'Kerakli punktlar to\'ldirilmagan'
 	];
+	$dateValidationFailedResponse = [
+		'result_code' => 43,
+		'result_message' => 'Sana formati noto\'g\'ri kiritilgan'
+	];
 
 	// PREPARE doc date
-	if($doc_outgoing_date){
-		$ar = explode('-', $doc_outgoing_date);
-		if(count($ar)==3){
-			$doc_outgoing_date = $ar[0].'-'.$ar[2].'-'.$ar[1];
-		}
+	$ar = explode('-', $doc_outgoing_date);
+	if($doc_outgoing_date && count($ar)==3){
+		$doc_outgoing_date = $ar[0].'-'.$ar[2].'-'.$ar[1];
+	}else {
+		return response()->json($dateValidationFailedResponse);
 	}
 
 	if(!($ban_id && $branch_name && $inspector_fio)){
