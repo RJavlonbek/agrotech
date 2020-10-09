@@ -441,17 +441,16 @@ Route::post('/mib/get_info', function(Request $request){
 	$customer_name=$request->fio_debtor;
 	$customer_passport_sn = trim($request->passport_sn);
 	$customer_passport_num = trim($request->passport_num);
-	$property_number = $request->property_number;
+	$property_number = str_replace(" ", "", $request->property_number);
 	$card_number = $request->card_number;
-
 
 	// validating required fields
 	$validationFailedResponse = [
-		'result_code'=>43,
-		'result_message'=>'Kerakli punktlar to\'ldirilmagan'
+		'result_code' => 43,
+		'result_message' => 'Kerakli punktlar to\'ldirilmagan'
 	];
 
-	if(!(($customer_passport_sn && $customer_passport_num) || $pinfl || $inn)){
+	if(!(($customer_passport_sn && $customer_passport_num) || $pinfl || $inn || $property_number)){
 		return response()->json($validationFailedResponse);
 	}
 
@@ -472,8 +471,22 @@ Route::post('/mib/get_info', function(Request $request){
 
 	$message = "xabarnoma qabul qilindi";
 
-	// automatic finding
 	$customer = Customer::where('status', '=', 1);
+	$property_ids = [];
+
+	// automatic finding
+	if($property_number){
+		// finding according to transport number
+		$tr_number = TransportNumber::where(DB::raw("CONCAT(UPPER(transport_numbers.code), UPPER(transport_numbers.series), UPPER(transport_numbers.number))"), '=', $property_number)->first();
+		if(empty($tr_number)){
+			return response()->json([
+				'result_code' => 43,
+				'result_message' => 'Berilgan DRB tizimda mavjud emas'
+			]);
+		}
+		$customer = $customer->where('id', '=', $tr_number->owner_id);
+		$property_ids[] = $tr_number->vehicle_id;
+	}
 	
 	if($inn){
 		$customer = $customer->where('inn', '=', $inn);
@@ -520,7 +533,14 @@ Route::post('/mib/get_info', function(Request $request){
 			$req->fio_debtor = trim($customer->lastname . ' ' . $customer->name . ' ' . $customer->middlename);
 		}
 
-		$transports=tbl_vehicles::where('status', '=', 'regged')
+		$transports=tbl_vehicles::where('status', '=', 'regged');
+
+		// filtering according to ids if some specific properties should be taken
+		if(count($property_ids)){
+			$transports = $transports->whereIn('id', $property_ids);
+		}
+
+		$transports = $transports
 			->join('tbl_vehicle_brands','tbl_vehicle_brands.id','=','tbl_vehicles.vehiclebrand_id')
 			->join('tbl_vehicle_types','tbl_vehicle_types.id','=','tbl_vehicle_brands.vehicle_id')
 			->where('tbl_vehicles.owner_id',$customer->id)
@@ -667,6 +687,7 @@ Route::post('/mib/lock', function(Request $request){
 
 	// checking existance of prohibition entity with given doc number
 	$request = vehicle_prohibitions::where('action', '=', 'lock')
+		->where('status', '=', 'active')
 		->where('locker_id', '=', 9)
 		->where('order_number', '=', $doc_number)
 		->first();
