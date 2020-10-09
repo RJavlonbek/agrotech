@@ -484,7 +484,7 @@ Route::post('/mib/get_info', function(Request $request){
 				'result_message' => 'Berilgan DRB tizimda mavjud emas'
 			]);
 		}
-		$customer = $customer->where('id', '=', $tr_number->owner_id);
+		$customer = $customer->where('customers.id', '=', $tr_number->owner_id);
 		$property_ids[] = $tr_number->vehicle_id;
 	}
 	
