@@ -537,7 +537,7 @@ Route::post('/mib/get_info', function(Request $request){
 
 		// filtering according to ids if some specific properties should be taken
 		if(count($property_ids)){
-			$transports = $transports->whereIn('id', $property_ids);
+			$transports = $transports->whereIn('tbl_vehicles.id', $property_ids);
 		}
 
 		$transports = $transports
